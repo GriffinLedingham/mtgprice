@@ -298,7 +298,7 @@ const fetchDeal = async (cardName) => {
 
       const results = await Promise.all(promises);
 
-      const flatResults = results.flat();
+      const flatResults = results.flat().filter((i) => i.name.indexOf(" Art ") === -1);
       flatResults.sort((a, b) => a.price - b.price);
 
       if (
@@ -306,11 +306,20 @@ const fetchDeal = async (cardName) => {
         flatResults[1] &&
         flatResults[0].price / flatResults[1].price < 0.75
       ) {
-        flatResults[0].name += ` (Deal ${
-          (flatResults[0].price / flatResults[1].price).toFixed(2) * 100
-        }%)`;
+        flatResults[0].name = `${(
+          (flatResults[0].price / flatResults[1].price) *
+          100
+        ).toFixed(2)}% - $${flatResults[0].price} - ${
+          flatResults[0].name
+        } (versus $${flatResults[1].price} at ${flatResults[1].store}) - ${
+          flatResults[0].store
+        }`;
+
+        console.log(flatResults[0].name);
 
         resultsAll = [...resultsAll, flatResults[0]];
+      } else {
+        console.log("No deal found, skipping ", cardsArr[i]);
       }
     } catch (e) {
       console.log(e);
